@@ -12,6 +12,8 @@ public class TileController : MonoBehaviour
     private static readonly Color selectedColor = new Color(0.5f, 0.5f, 0.5f);
     private static readonly Color normalColor = Color.white;
 
+    private static readonly float moveDuration = 0.5f;
+
     private static TileController previouseSelected = null;
 
     private bool isSelected = false;
@@ -44,12 +46,21 @@ public class TileController : MonoBehaviour
             }
             else
             {
-                previouseSelected.Deselect();
-                Select();
+                TileController otherTile = previouseSelected;
+                //Swap Tile
+                SwapTile(otherTile, () =>
+                {
+                    SwapTile(otherTile);
+                });
+                
+                //run if cant swap
+                /*previouseSelected.Deselect();
+                Select();*/
             }
         }
     }
 
+    //Changing Tiles ID
     public void ChangeId(int id, int x, int y)
     {
         render.sprite = board.tileTypes[id];
@@ -58,6 +69,7 @@ public class TileController : MonoBehaviour
         name = "TILE_" + id + " (" + x + ", " + y + ")";
     }
 
+    //Selecting and Deselecting
     private void Select()
     {
         isSelected = true;
@@ -70,5 +82,33 @@ public class TileController : MonoBehaviour
         isSelected = false;
         render.color = normalColor;
         previouseSelected = null;
+    }
+
+    //Swapping Animation
+    public IEnumerator MoveTilePosition(Vector2 targetPosition, System.Action onCompleted)
+    {
+        Vector2 startPosition = transform.position;
+        float time = 0.0f;
+
+        //Wait for next frame
+        yield return new WaitForEndOfFrame();
+
+        while (time < moveDuration)
+        {
+            transform.position = Vector2.Lerp(startPosition, targetPosition, time / moveDuration);
+            time += Time.deltaTime;
+
+            //Wait for next frame
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.position = targetPosition;
+
+        onCompleted?.Invoke();
+    }
+
+    public void SwapTile(TileController otherTile, System.Action onCompleted = null)
+    {
+        StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
     }
 }

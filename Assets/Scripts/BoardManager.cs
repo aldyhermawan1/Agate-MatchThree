@@ -37,12 +37,27 @@ public class BoardManager : MonoBehaviour
     private Vector2 endPosition;
     private TileController[,] tiles;
 
+    public bool IsAnimating
+    {
+        get
+        {
+            return IsSwapping;
+        }
+    }
+    
+    public bool IsSwapping
+    {
+        get;
+        set;
+    }
+
     private void Start()
     {
         Vector2 tileSize = tilePrefab.GetComponent<SpriteRenderer>().size;
         CreateBoard(tileSize);
     }
 
+    //Spawning Board
     private void CreateBoard(Vector2 tileSize)
     {
         tiles = new TileController[size.x, size.y];
@@ -67,6 +82,7 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    //Spawning different color
     private List<int> GetStartingPossibleIdList(int x, int y)
     {
         List<int> possibleId = new List<int>();
@@ -87,5 +103,63 @@ public class BoardManager : MonoBehaviour
         }
 
         return possibleId;
+    }
+
+    //Swapping Tiles
+    public IEnumerator SwapTilePosition(TileController a, TileController b, System.Action onCompleted)
+    {
+        IsSwapping = true;
+
+        Vector2Int IndexA = GetTileIndex(a);
+        Vector2Int IndexB = GetTileIndex(b);
+
+        tiles[IndexA.x, IndexA.y] = b;
+        tiles[IndexB.x, IndexB.y] = a;
+
+        a.ChangeId(a.id, IndexB.x, IndexB.y);
+        b.ChangeId(b.id, IndexA.x, IndexA.y);
+
+        bool isRoutineACompleted = false;
+        bool isRoutineBCompleted = false;
+
+        StartCoroutine(a.MoveTilePosition(GetIndexPosition(IndexB), () =>
+        {
+            isRoutineACompleted = true;
+        }));
+        StartCoroutine(b.MoveTilePosition(GetIndexPosition(IndexA), () =>
+        {
+            isRoutineBCompleted = true;
+        }));
+
+        yield return new WaitUntil(() =>
+        {
+            return isRoutineACompleted && isRoutineBCompleted;
+        });
+
+        onCompleted?.Invoke();
+
+        IsSwapping = false;
+    }
+
+    public Vector2Int GetTileIndex(TileController tile)
+    {
+        for(int x = 0; x < size.x; x++)
+        {
+            for(int y = 0; y < size.y; y++)
+            {
+                if (tile == tiles[x, y])
+                {
+                    return new Vector2Int(x, y);
+                }
+            }
+        }
+
+        return new Vector2Int(-1, 1);
+    }
+
+    public Vector2 GetIndexPosition(Vector2Int index)
+    {
+        Vector2 tileSize = tilePrefab.GetComponent<SpriteRenderer>().size;
+        return new Vector2(startPosition.x + ((tileSize.x + offsetTile.x) * index.x), startPosition.y + ((tileSize.y + offsetTile.y) * index.y));
     }
 }
