@@ -14,7 +14,12 @@ public class TileController : MonoBehaviour
 
     private static readonly float moveDuration = 0.5f;
 
-    private static TileController previouseSelected = null;
+    private static readonly Vector2[] adjacentDirection = new Vector2[]
+    {
+        Vector2.up, Vector2.down, Vector2.left, Vector2.right
+    };
+
+    private static TileController previousSelected = null;
 
     private bool isSelected = false;
 
@@ -27,7 +32,7 @@ public class TileController : MonoBehaviour
     private void OnMouseDown()
     {
         //Non Selectable
-        if (render.sprite == null)
+        if (render.sprite == null || board.IsAnimating)
         {
             return;
         }
@@ -40,22 +45,29 @@ public class TileController : MonoBehaviour
         else
         {
             //Nothing selected yet
-            if (previouseSelected == null)
+            if (previousSelected == null)
             {
                 Select();
             }
             else
             {
-                TileController otherTile = previouseSelected;
-                //Swap Tile
-                SwapTile(otherTile, () =>
+                //Adjacent Check
+                if (GetAllAdjacentTiles().Contains(previousSelected))
                 {
-                    SwapTile(otherTile);
-                });
-                
-                //run if cant swap
-                /*previouseSelected.Deselect();
-                Select();*/
+                    TileController otherTile = previousSelected;
+                    previousSelected.Deselect();
+
+                    //Swap Tile
+                    SwapTile(otherTile, () =>
+                    {
+                        SwapTile(otherTile);
+                    });
+                }
+                else
+                {
+                    previousSelected.Deselect();
+                    Select();
+                }
             }
         }
     }
@@ -69,19 +81,20 @@ public class TileController : MonoBehaviour
         name = "TILE_" + id + " (" + x + ", " + y + ")";
     }
 
-    //Selecting and Deselecting
+    //Selecting Tile
     private void Select()
     {
         isSelected = true;
         render.color = selectedColor;
-        previouseSelected = this;
+        previousSelected = this;
     }
 
+    //Deselecting Tile
     private void Deselect()
     {
         isSelected = false;
         render.color = normalColor;
-        previouseSelected = null;
+        previousSelected = null;
     }
 
     //Swapping Animation
@@ -107,8 +120,34 @@ public class TileController : MonoBehaviour
         onCompleted?.Invoke();
     }
 
+    //Swapping Tile
     public void SwapTile(TileController otherTile, System.Action onCompleted = null)
     {
         StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
+    }
+
+    //Adjacent Checking
+    private TileController GetAdjacent(Vector2 castDir)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, castDir, render.size.x);
+
+        if (hit)
+        {
+            return hit.collider.GetComponent<TileController>();
+        }
+
+        return null;
+    }
+
+    public List<TileController> GetAllAdjacentTiles()
+    {
+        List<TileController> adjacentTiles = new List<TileController>();
+
+        for (int i = 0; i < adjacentDirection.Length; i++)
+        {
+            adjacentTiles.Add(GetAdjacent(adjacentDirection[i]));
+        }
+
+        return adjacentTiles;
     }
 }
