@@ -162,4 +162,35 @@ public class BoardManager : MonoBehaviour
         Vector2 tileSize = tilePrefab.GetComponent<SpriteRenderer>().size;
         return new Vector2(startPosition.x + ((tileSize.x + offsetTile.x) * index.x), startPosition.y + ((tileSize.y + offsetTile.y) * index.y));
     }
+
+    //Checking Matches
+    public List<TileController> GetAllMatches()
+    {
+        List<TileController> matchingTiles = new List<TileController>();
+
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                List<TileController> tileMatched = tiles[x, y].GetAllMatches();
+
+                //Go next if no match
+                if (tileMatched == null || tileMatched.Count == 0)
+                {
+                    continue;
+                }
+
+                foreach(TileController item in tileMatched)
+                {
+                    //only add if not added
+                    if (!matchingTiles.Contains(item))
+                    {
+                        matchingTiles.Add(item);
+                    }
+                }
+            }
+        }
+
+        return matchingTiles;
+    }
 }
