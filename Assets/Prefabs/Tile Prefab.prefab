@@ -119,14 +119,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88494f731d970c749828972162dc7ed7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: {x: 0, y: 0}
-  offsetTile: {x: 0, y: 0}
-  offsetBoard: {x: 0, y: 0}
-  tileTypes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  tilePrefab: {fileID: 0}
+  id: 0

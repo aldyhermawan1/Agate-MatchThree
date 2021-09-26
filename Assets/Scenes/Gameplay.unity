@@ -146,14 +146,11 @@ MonoBehaviour:
   offsetBoard: {x: 0, y: -0.25}
   tileTypes:
   - {fileID: 21300000, guid: ae6f1e923c04ae946ba8396d0df1a457, type: 3}
-  - {fileID: 21300000, guid: e58d81997da15824fa58e89b2e05b72d, type: 3}
   - {fileID: 21300000, guid: ee8ffc02dda71bb41af6aa8c077bfa76, type: 3}
-  - {fileID: 21300000, guid: 126946647e31e7a4c9d522a7ef3f5062, type: 3}
   - {fileID: 21300000, guid: 267eb6c65eaed4946b373bd59aa1bba6, type: 3}
   - {fileID: 21300000, guid: 7e7122f3869c15d42932ce047ff7b86f, type: 3}
-  - {fileID: 21300000, guid: 1d1f22206684e9d4891edf3a642bb292, type: 3}
-  - {fileID: 21300000, guid: 30d7e4416e8d83a418b71df1254158a3, type: 3}
   - {fileID: 21300000, guid: ffbab35dcbb245e45bf8a92832b7e57c, type: 3}
+  - {fileID: 21300000, guid: 1d1f22206684e9d4891edf3a642bb292, type: 3}
   tilePrefab: {fileID: 7081561061704961281, guid: afc9ba9810c894343ab2d61721c59ef3,
     type: 3}
 --- !u!4 &318930388
